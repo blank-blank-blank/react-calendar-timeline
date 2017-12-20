@@ -89,6 +89,7 @@ export default class ReactCalendarTimeline extends Component {
 
     minZoom: PropTypes.number,
     maxZoom: PropTypes.number,
+    disableZoom: PropTypes.Boolean,
 
     clickTolerance: PropTypes.number,
 
@@ -214,6 +215,7 @@ export default class ReactCalendarTimeline extends Component {
 
     minZoom: 60 * 60 * 1000, // 1 hour
     maxZoom: 5 * 365.24 * 86400 * 1000, // 5 years
+    disableZoom: false,
 
     clickTolerance: 3, // how many pixels can we drag for it to be still considered a click?
 
@@ -632,12 +634,14 @@ export default class ReactCalendarTimeline extends Component {
   }
 
   changeZoom (scale, offset = 0.5) {
-    const { minZoom, maxZoom } = this.props
-    const oldZoom = this.state.visibleTimeEnd - this.state.visibleTimeStart
-    const newZoom = Math.min(Math.max(Math.round(oldZoom * scale), minZoom), maxZoom) // min 1 min, max 20 years
-    const newVisibleTimeStart = Math.round(this.state.visibleTimeStart + (oldZoom - newZoom) * offset)
+    if (!this.props.disableZoom) {
+      const {minZoom, maxZoom} = this.props
+      const oldZoom = this.state.visibleTimeEnd - this.state.visibleTimeStart
+      const newZoom = Math.min(Math.max(Math.round(oldZoom * scale), minZoom), maxZoom) // min 1 min, max 20 years
+      const newVisibleTimeStart = Math.round(this.state.visibleTimeStart + (oldZoom - newZoom) * offset)
 
-    this.props.onTimeChange(newVisibleTimeStart, newVisibleTimeStart + newZoom, this.updateScrollCanvas)
+      this.props.onTimeChange(newVisibleTimeStart, newVisibleTimeStart + newZoom, this.updateScrollCanvas)
+    }
   }
 
   showPeriod = (from, unit) => {
